@@ -4,16 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { useJobs } from '@/hooks/useJobs';
 import { useAuth } from '@/hooks/useAuth';
 import { Calendar, MapPin, Building, Clock, MessageSquare, ChevronRight, Briefcase, Loader2, FileText, AlertTriangle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Applications = () => {
   const { applications, loading } = useJobs();
   const { user } = useAuth();
 
-  // Filtra las postulaciones que pertenecen al usuario logueado.
   const userApplications = applications.filter(app => app.candidate?.id === user?.id);
 
-  // Funciones para obtener los colores y textos de los estados de la postulación
   const getStatusColorClasses = (status) => {
     switch (status) {
       case 'submitted': return 'bg-blue-100 text-blue-700 border-blue-300';
@@ -41,16 +39,14 @@ const Applications = () => {
     });
   };
 
-  // Configuración para la línea de tiempo del progreso
   const timelineStatusMap = {
     submitted: { text: 'Enviada', color: 'text-blue-500' },
     reviewing: { text: 'En Revisión', color: 'text-yellow-500' },
     interview: { text: 'Entrevista', color: 'text-purple-500' },
   };
-  
+
   const applicationTimeline = ['submitted', 'reviewing', 'interview'];
 
-  // Muestra un indicador de carga mientras se obtienen los datos
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -59,17 +55,16 @@ const Applications = () => {
       </div>
     );
   }
-  
-  // Mensaje si un usuario no candidato intenta ver la página
+
   if (user && user.role !== 'candidate') {
     return (
       <div className="text-center py-12">
         <Card className="bg-card border-border p-8 shadow-lg max-w-md mx-auto">
-            <AlertTriangle className="w-16 h-16 text-destructive mx-auto mb-4" />
-            <CardTitle className="text-destructive text-2xl mb-2">Acceso Denegado</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Esta sección es exclusiva para candidatos.
-            </CardDescription>
+          <AlertTriangle className="w-16 h-16 text-destructive mx-auto mb-4" />
+          <CardTitle className="text-destructive text-2xl mb-2">Acceso Denegado</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Esta sección es exclusiva para candidatos.
+          </CardDescription>
         </Card>
       </div>
     );
@@ -95,85 +90,92 @@ const Applications = () => {
         </motion.div>
       ) : (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="grid gap-6">
-          {userApplications.map((application, index) => {
-            const job = application.job;
-            if (!job) return null; // Medida de seguridad por si no hay datos del trabajo
+          <AnimatePresence>
+            {userApplications.map((application, index) => {
+              const job = application.job;
+              if (!application?.id || !job) return null;
 
-            let currentStatusIndex = applicationTimeline.indexOf(application.status);
-            if (application.status === 'accepted' || application.status === 'rejected') {
-                currentStatusIndex = applicationTimeline.length; 
-            }
+              let currentStatusIndex = applicationTimeline.indexOf(application.status);
+              if (application.status === 'accepted' || application.status === 'rejected') {
+                currentStatusIndex = applicationTimeline.length;
+              }
 
-            return (
-              <motion.div key={application.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.1 }}>
-                <Card className="bg-card border-border hover:shadow-xl transition-all duration-300">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-foreground text-xl">{job.title}</CardTitle>
-                        <CardDescription className="text-muted-foreground mt-1">{job.department || 'Departamento no especificado'}</CardDescription>
+              return (
+                <motion.div
+                  key={application.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="bg-card border-border hover:shadow-xl transition-all duration-300">
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-foreground text-xl">{job.title}</CardTitle>
+                          <CardDescription className="text-muted-foreground mt-1">{job.department || 'Departamento no especificado'}</CardDescription>
+                        </div>
+                        <Badge className={`${getStatusColorClasses(application.status)} border font-semibold`}>{getStatusText(application.status)}</Badge>
                       </div>
-                      <Badge className={`${getStatusColorClasses(application.status)} border font-semibold`}>{getStatusText(application.status)}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center space-x-2"><MapPin className="w-4 h-4 text-primary" /><span>{job.location}</span></div>
                         <div className="flex items-center space-x-2"><Building className="w-4 h-4 text-primary" /><span>{job.department}</span></div>
                         <div className="flex items-center space-x-2"><Calendar className="w-4 h-4 text-primary" /><span>Postulado: {formatDate(application.appliedAt)}</span></div>
                         <div className="flex items-center space-x-2"><Clock className="w-4 h-4 text-primary" /><span>{job.type}</span></div>
-                    </div>
-                    
-                    {/* Sección para mostrar los mensajes del reclutador */}
-                    {application.messages && application.messages.length > 0 && (
-                      <div className="space-y-3 pt-4 border-t border-border">
-                        <h4 className="text-foreground font-medium flex items-center"><MessageSquare className="w-5 h-5 mr-2 text-primary" />Mensajes del Reclutador</h4>
-                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                          {application.messages.map((msg) => (
-                            <div key={msg.id} className="bg-input p-3 rounded-lg shadow-sm">
-                              <p className="text-foreground text-sm whitespace-pre-wrap">{msg.text}</p>
-                              <p className="text-xs text-muted-foreground mt-1 text-right">{formatDate(msg.createdAt)}</p>
-                            </div>
-                          ))}
-                        </div>
                       </div>
-                    )}
-                    
-                    {/* Línea de tiempo del progreso de la postulación */}
-                    <div className="mt-6 pt-4 border-t border-border">
+
+                      {application.messages && application.messages.length > 0 && (
+                        <div className="space-y-3 pt-4 border-t border-border">
+                          <h4 className="text-foreground font-medium flex items-center"><MessageSquare className="w-5 h-5 mr-2 text-primary" />Mensajes del Reclutador</h4>
+                          <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                            {application.messages.map((msg) => (
+                              <div key={msg.id} className="bg-input p-3 rounded-lg shadow-sm">
+                                <p className="text-foreground text-sm whitespace-pre-wrap">{msg.text}</p>
+                                <p className="text-xs text-muted-foreground mt-1 text-right">{formatDate(msg.createdAt)}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mt-6 pt-4 border-t border-border">
                         <h4 className="text-foreground text-sm font-medium mb-3">Progreso de Postulación:</h4>
                         <div className="flex items-center space-x-1">
-                            {applicationTimeline.map((statusKey, idx) => {
-                                const statusInfo = timelineStatusMap[statusKey];
-                                const isActive = idx <= currentStatusIndex;
-                                return (
-                                    <React.Fragment key={statusKey}>
-                                        <div className={`flex items-center space-x-1 ${isActive ? statusInfo.color : 'text-gray-400'}`}>
-                                            <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-current' : 'bg-gray-300'}`}></div>
-                                            <span className="text-xs font-medium">{statusInfo.text}</span>
-                                        </div>
-                                        {idx < applicationTimeline.length - 1 && (
-                                            <ChevronRight className={`w-4 h-4 ${isActive && currentStatusIndex > idx ? statusInfo.color : 'text-gray-300'}`} />
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
-                            {(application.status === 'accepted' || application.status === 'rejected') && (
-                               <React.Fragment>
-                                 <ChevronRight className={`w-4 h-4 ${getStatusColorClasses(application.status).replace('bg-green-100', 'text-green-500').replace('bg-red-100', 'text-red-500')}`} />
-                                  <div className={`flex items-center space-x-1 ${getStatusColorClasses(application.status).replace('bg-green-100', 'text-green-500').replace('bg-red-100', 'text-red-500')}`}>
-                                      <div className="w-3 h-3 rounded-full bg-current"></div>
-                                      <span className="text-xs font-medium">{getStatusText(application.status)}</span>
-                                  </div>
-                               </React.Fragment>
-                            )}
+                          {applicationTimeline.map((statusKey, idx) => {
+                            const statusInfo = timelineStatusMap[statusKey];
+                            const isActive = idx <= currentStatusIndex;
+                            return (
+                              <React.Fragment key={statusKey}>
+                                <div className={`flex items-center space-x-1 ${isActive ? statusInfo.color : 'text-gray-400'}`}>
+                                  <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-current' : 'bg-gray-300'}`}></div>
+                                  <span className="text-xs font-medium">{statusInfo.text}</span>
+                                </div>
+                                {idx < applicationTimeline.length - 1 && (
+                                  <ChevronRight className={`w-4 h-4 ${isActive && currentStatusIndex > idx ? statusInfo.color : 'text-gray-300'}`} />
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                          {(application.status === 'accepted' || application.status === 'rejected') && (
+                            <React.Fragment>
+                              <ChevronRight className={`w-4 h-4 ${getStatusColorClasses(application.status).includes('green') ? 'text-green-500' : 'text-red-500'}`} />
+                              <div className={`flex items-center space-x-1 ${getStatusColorClasses(application.status).includes('green') ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className="w-3 h-3 rounded-full bg-current"></div>
+                                <span className="text-xs font-medium">{getStatusText(application.status)}</span>
+                              </div>
+                            </React.Fragment>
+                          )}
                         </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </motion.div>
       )}
     </div>

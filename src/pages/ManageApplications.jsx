@@ -57,7 +57,7 @@ const ManageApplications = () => {
   // Función para ver el CV de forma segura
   const handleViewCv = async (fileName) => {
     try {
-        const response = await fetch(`http://localhost:8080/api/files/cvs/${fileName}`, {
+        const response = await fetch(`https://green-water-0ea21d31e.6.azurestaticapps.net/api/files/cvs/${fileName}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         if (!response.ok) throw new Error('No se pudo descargar el archivo.');

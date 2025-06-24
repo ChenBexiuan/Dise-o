@@ -4,7 +4,7 @@
 // - Manejo automático del token JWT para autenticación
 
 // URL base del backend (puedes cambiarla fácilmente al pasar a producción)
-const API_BASE_URL = 'https://sodimac-api-e5hchdb6bjbyahd4.centralus-01.azurewebsites.net/api';
+const API_BASE_URL = 'sodimac-api-e5hchdb6bjbyahd4.centralus-01.azurewebsites.net/api';
 
 /**
  * Función principal para interactuar con el backend.

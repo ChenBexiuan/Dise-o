@@ -37,11 +37,7 @@ const Register = () => {
       toast({ title: 'Error', description: 'La contraseña debe tener al menos 6 caracteres', variant: 'destructive' });
       return;
     }
-    // Verificamos que se haya seleccionado un rol
-    if (!formData.role) {
-      toast({ title: 'Error', description: 'Por favor selecciona un tipo de usuario', variant: 'destructive' });
-      return;
-    }
+
 
     setLoading(true);
 

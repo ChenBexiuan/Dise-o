@@ -121,30 +121,7 @@ const Register = () => {
                 <Input id="phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-input border-border text-foreground placeholder:text-muted-foreground" placeholder="Ej: 987 654 321" />
               </div>
               
-              {/* --- CAMPO DE ROL RESTAURADO --- */}
-              <div className="space-y-2">
-                <Label htmlFor="role" className="text-foreground">Tipo de Usuario *</Label>
-                <Select required value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger className="bg-input border-border text-foreground"><SelectValue placeholder="Selecciona tu rol" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="candidate">Candidato</SelectItem>
-                    <SelectItem value="manager">Gerente de Área</SelectItem>
-                    <SelectItem value="hr">Recursos Humanos</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {(formData.role === 'manager' || formData.role === 'hr') && (
-                <div className="space-y-2">
-                  <Label htmlFor="department" className="text-foreground">Departamento (Opcional)</Label>
-                  <Select value={formData.department} onValueChange={(value) => setFormData({ ...formData, department: value })}>
-                    <SelectTrigger className="bg-input border-border text-foreground"><SelectValue placeholder="Selecciona departamento" /></SelectTrigger>
-                    <SelectContent>
-                      {peruvianDepartments.map(dept => (<SelectItem key={dept} value={dept}>{dept}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+              
               
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-foreground">Contraseña *</Label>

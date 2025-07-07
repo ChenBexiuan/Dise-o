@@ -1,0 +1,139 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Neutrals */
+  --background: 220 15% 96%; /* Light Gray - dominant neutral */
+  --foreground: 220 20% 15%; /* Dark Gray/Black - for text */
+
+  --card: 0 0% 100%; /* White - for cards */
+  --card-foreground: 220 20% 15%;
+
+  --popover: 0 0% 100%; /* White */
+  --popover-foreground: 220 20% 15%;
+
+  --border: 220 15% 85%; /* Lighter Gray for borders */
+  --input: 220 15% 92%; /* Slightly off-white for inputs */
+  
+  /* Sodimac Accent Colors */
+  --primary: 30 90% 55%; /* Sodimac Orange - main interactive color */
+  --primary-foreground: 0 0% 100%; /* White text on orange */
+
+  --secondary: 45 95% 50%; /* Sodimac Yellow - secondary interactive/accent */
+  --secondary-foreground: 30 50% 10%; /* Darker text on yellow */
+
+  --accent: 210 90% 55%; /* Sodimac Blue - for highlights, links, or tertiary actions */
+  --accent-foreground: 0 0% 100%; /* White text on blue */
+
+  --muted: 220 15% 75%; /* Medium Gray for muted text/elements */
+  --muted-foreground: 220 10% 45%;
+  
+  --destructive: 0 70% 50%; /* Sodimac Red - for destructive actions, errors */
+  --destructive-foreground: 0 0% 100%; /* White text on red */
+  
+  --ring: 30 90% 65%; /* Lighter Orange for focus rings */
+  
+  --radius: 0.5rem;
+}
+
+/* Minimal Dark Mode (Optional - can be expanded if Sodimac has a dark theme) */
+/* For now, we'll keep it light as per "predominan los colores neutros como el blanco y el gris" */
+/*
+.dark {
+  --background: 220 20% 12%; 
+  --foreground: 220 15% 90%;
+
+  --card: 220 20% 18%;
+  --card-foreground: 220 15% 90%;
+
+  --popover: 220 20% 15%;
+  --popover-foreground: 220 15% 90%;
+
+  --border: 220 15% 30%;
+  --input: 220 15% 25%;
+  
+  --primary: 30 85% 60%; 
+  --primary-foreground: 20 0% 100%;
+
+  --secondary: 45 85% 55%; 
+  --secondary-foreground: 30 50% 10%;
+
+  --accent: 210 85% 60%;
+  --accent-foreground: 0 0% 100%;
+
+  --muted: 220 15% 35%;
+  --muted-foreground: 220 10% 65%;
+  
+  --destructive: 0 65% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --ring: 30 85% 70%;
+}
+*/
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Glass effect using new neutrals if needed, or remove if not fitting the new theme */
+.glass-effect {
+  background: hsla(var(--card) / 0.8); /* Semi-transparent white/card color */
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  border: 1px solid hsl(var(--border));
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); } /* Reduced float for a more subtle effect */
+}
+
+.animate-pulse-slow {
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.card-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 10px 20px -5px hsla(var(--primary)/ 0.2); /* Shadow using primary color */
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background) / 0.5);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.7);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}

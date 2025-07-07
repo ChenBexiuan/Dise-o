@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/components/ui/use-toast';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
@@ -16,9 +15,7 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: '', // El rol se seleccionará desde el formulario
     phone: '',
-    department: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -37,30 +34,24 @@ const Register = () => {
       toast({ title: 'Error', description: 'La contraseña debe tener al menos 6 caracteres', variant: 'destructive' });
       return;
     }
-    // Verificamos que se haya seleccionado un rol
-    if (!formData.role) {
-      toast({ title: 'Error', description: 'Por favor selecciona un tipo de usuario', variant: 'destructive' });
-      return;
-    }
 
     setLoading(true);
 
     try {
-      // Preparamos los datos incluyendo el rol seleccionado en el formulario.
+      // Preparamos los datos para el backend, asignando el rol 'candidate' por defecto.
       const userDataToSend = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: formData.role,
+        role: 'candidate', // El rol se asigna automáticamente.
         phone: formData.phone,
-        department: formData.department
       };
 
       await register(userDataToSend);
 
       toast({
           title: '¡Registro exitoso!',
-          description: `La cuenta para ${formData.name} ha sido creada. Por favor, inicia sesión.`,
+          description: Bienvenido ${formData.name}, tu cuenta ha sido creada. Por favor, inicia sesión.,
       });
       navigate('/login');
 
@@ -75,13 +66,6 @@ const Register = () => {
     }
   };
   
-  const peruvianDepartments = [
-    'Ventas Retail (Tienda)', 'Cajas y Tesorería', 'Logística y Distribución', 'Atención al Cliente y Postventa', 
-    'Administración y Contabilidad', 'Recursos Humanos y Bienestar', 'Marketing y Publicidad Digital', 
-    'Tecnología y Sistemas (IT)', 'Mantenimiento e Infraestructura', 'Gerencia de Tienda y Operaciones',
-    'Proyectos Especiales y Decoración', 'E-commerce y Ventas Online', 'Prevención de Pérdidas', 'Visual Merchandising'
-  ];
-
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-8 p-4">
       <motion.div
@@ -100,9 +84,9 @@ const Register = () => {
             >
               <UserPlus className="w-8 h-8 text-primary-foreground" />
             </motion.div>
-            <CardTitle className="text-2xl text-foreground">Crear Cuenta</CardTitle>
+            <CardTitle className="text-2xl text-foreground">Crear Cuenta de Candidato</CardTitle>
             <CardDescription className="text-muted-foreground">
-              Únete a SODIMAC Reclutamiento Perú y encuentra tu oportunidad
+              Únete a SODIMAC Perú y encuentra tu oportunidad
             </CardDescription>
           </CardHeader>
           
@@ -121,31 +105,8 @@ const Register = () => {
                 <Input id="phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-input border-border text-foreground placeholder:text-muted-foreground" placeholder="Ej: 987 654 321" />
               </div>
               
-              {/* --- CAMPO DE ROL RESTAURADO --- */}
-              <div className="space-y-2">
-                <Label htmlFor="role" className="text-foreground">Tipo de Usuario *</Label>
-                <Select required value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger className="bg-input border-border text-foreground"><SelectValue placeholder="Selecciona tu rol" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="candidate">Candidato</SelectItem>
-                    <SelectItem value="manager">Gerente de Área</SelectItem>
-                    <SelectItem value="hr">Recursos Humanos</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* --- CAMPO DE ROL Y DEPARTAMENTO ELIMINADOS DEL FORMULARIO --- */}
 
-              {(formData.role === 'manager' || formData.role === 'hr') && (
-                <div className="space-y-2">
-                  <Label htmlFor="department" className="text-foreground">Departamento (Opcional)</Label>
-                  <Select value={formData.department} onValueChange={(value) => setFormData({ ...formData, department: value })}>
-                    <SelectTrigger className="bg-input border-border text-foreground"><SelectValue placeholder="Selecciona departamento" /></SelectTrigger>
-                    <SelectContent>
-                      {peruvianDepartments.map(dept => (<SelectItem key={dept} value={dept}>{dept}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-foreground">Contraseña *</Label>
                 <div className="relative">

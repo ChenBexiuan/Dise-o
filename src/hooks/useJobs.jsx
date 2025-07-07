@@ -28,7 +28,7 @@ export const JobsProvider = ({ children }) => {
   // Función para obtener datos del backend
   const fetchData = useCallback(async () => {
     // Si no hay usuario, solo se cargan los trabajos públicos
-    if (!user || !user.id) {
+    if (!user) {
       setLoading(true);
       try {
         const jobsData = await fetchApi('/jobs'); // Petición a trabajos públicos
@@ -52,12 +52,10 @@ export const JobsProvider = ({ children }) => {
       const jobsData = await fetchApi('/jobs'); // Carga trabajos
       setJobs(jobsData || []);
 
-      // Candidato: obtener solo sus postulaciones
       if (user.role === 'candidate') {
         const applicationsData = await fetchApi(`/applications/candidate/${user.id}`);
         setApplications(applicationsData || []);
       } 
-      // RRHH o manager: obtener todas las postulaciones
       else if (user.role === 'manager' || user.role === 'hr') {
         const applicationsData = await fetchApi('/applications');
         setApplications(applicationsData || []);
@@ -72,27 +70,21 @@ export const JobsProvider = ({ children }) => {
   // Efecto: se ejecuta cada vez que el usuario cambia
   useEffect(() => {
     fetchData();
-  }, [user, fetchData]);
+  }, [fetchData]);
 
-  // Función para postularse a un trabajo
+  // --- FUNCIÓN DE POSTULACIÓN (VERSIÓN FINAL) ---
+  // Diferencia: Esta versión usa FormData para enviar texto y archivos en una sola petición.
+  // Es más robusta que hacer dos llamadas separadas.
   const applyToJob = async (jobId, textData, cvFile) => {
     const formData = new FormData();
-
-    // Agregamos los datos de texto como un blob JSON
     formData.append('application', new Blob([JSON.stringify(textData)], { type: "application/json" }));
-
-    // Si hay un archivo CV, lo agregamos también
     if (cvFile) {
       formData.append('cvFile', cvFile);
     }
-
-    // Enviamos los datos al backend
     const newApplication = await fetchApi(`/applications/${jobId}`, {
       method: 'POST',
-      body: formData, // Enviamos el FormData
+      body: formData,
     });
-
-    // Recargamos los datos para actualizar la UI
     await fetchData();
     return newApplication;
   };
@@ -101,34 +93,33 @@ export const JobsProvider = ({ children }) => {
   const createJob = async (jobData) => {
     const newJob = await fetchApi('/jobs', {
       method: 'POST',
-      body: JSON.stringify(jobData), // Enviamos los datos como JSON
+      body: JSON.stringify(jobData),
     });
-    setJobs(prevJobs => [...prevJobs, newJob]); // Actualizamos la lista de trabajos
+    await fetchData(); // Recargamos para asegurar consistencia
     return newJob;
   };
 
-  // Función para cambiar el estado de una oferta (por ejemplo: abierta/cerrada)
+  // --- FUNCIÓN DE ACTUALIZACIÓN DE ESTADO DE TRABAJO (VERSIÓN FINAL) ---
+  // Diferencia: Esta versión llama a un endpoint específico (`/status`) y envía solo
+  // el nuevo estado, en lugar de todo el objeto 'job'. Esto es más seguro y eficiente.
   const updateJobStatus = async (jobId, status) => {
-    const originalJob = jobs.find(job => job.id === jobId); // Buscamos el trabajo actual
-    const updatedJob = await fetchApi(`/jobs/${jobId}`, {
+    await fetchApi(`/jobs/${jobId}/status`, {
       method: 'PUT',
-      body: JSON.stringify({ ...originalJob, status }) // Actualizamos el estado
+      body: JSON.stringify({ status: status })
     });
-    await fetchData(); // Recargamos los datos
+    await fetchData();
   };
 
-  // Función para cambiar el estado de una postulación (por ejemplo: aceptada/rechazada)
+  // Función para cambiar el estado de una postulación
   const updateApplicationStatus = async (applicationId, newStatus, message) => {
-    const updatedApplication = await fetchApi(`/applications/${applicationId}`, {
+    await fetchApi(`/applications/${applicationId}`, {
       method: 'PUT',
       body: JSON.stringify({ 
         status: newStatus, 
         message: message 
       }),
     });
-
-    await fetchData(); // Recargamos los datos
-    return updatedApplication;
+    await fetchData();
   };
 
   // Valores que se compartirán a través del contexto

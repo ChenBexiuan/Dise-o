@@ -14,15 +14,19 @@ const ApproveJobs = () => {
 
   const pendingJobs = jobs.filter(job => job.status === 'pending');
 
+  // --- FUNCIÓN MODIFICADA ---
   const handleApprove = async (jobId) => {
     try {
+      // Esperamos a que la operación del backend termine.
       await updateJobStatus(jobId, 'approved');
+      // El toast solo se muestra si la operación fue exitosa.
       toast({
         title: '¡Trabajo Aprobado!',
         description: 'El trabajo ha sido aprobado y ahora está visible para los candidatos.',
         className: 'bg-green-100 border-green-300 text-green-700',
       });
     } catch (error) {
+      // Si hay un error, lo mostramos al usuario.
       toast({
         title: 'Error',
         description: 'No se pudo aprobar el trabajo.',
@@ -31,8 +35,10 @@ const ApproveJobs = () => {
     }
   };
 
+  // --- FUNCIÓN MODIFICADA ---
   const handleReject = async (jobId) => {
     try {
+      // Esperamos a que la operación del backend termine.
       await updateJobStatus(jobId, 'rejected');
       toast({
         title: 'Trabajo Rechazado',

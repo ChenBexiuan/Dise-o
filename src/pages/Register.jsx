@@ -21,10 +21,10 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validaciones del formulario
     if (formData.password !== formData.confirmPassword) {
       toast({ title: 'Error', description: 'Las contraseñas no coinciden', variant: 'destructive' });
@@ -43,29 +43,28 @@ const Register = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: 'candidate', // El rol se asigna automáticamente.
+        role: 'candidate',
         phone: formData.phone,
       };
 
       await register(userDataToSend);
 
       toast({
-          title: '¡Registro exitoso!',
-          description: Bienvenido ${formData.name}, tu cuenta ha sido creada. Por favor, inicia sesión.,
+        title: '¡Registro exitoso!',
+        description: `Bienvenido ${formData.name}, tu cuenta ha sido creada. Por favor, inicia sesión.`,
       });
       navigate('/login');
-
     } catch (error) {
       toast({
         title: 'Error de registro',
         description: error.message || 'Ocurrió un error al crear la cuenta.',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-8 p-4">
       <motion.div
@@ -89,41 +88,89 @@ const Register = () => {
               Únete a SODIMAC Perú y encuentra tu oportunidad
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground">Nombre Completo</Label>
-                <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-input border-border text-foreground placeholder:text-muted-foreground" placeholder="Tu nombre completo" required />
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                  placeholder="Tu nombre completo"
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground">Email</Label>
-                <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-input border-border text-foreground placeholder:text-muted-foreground" placeholder="tu@email.com" required />
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                  placeholder="tu@email.com"
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-foreground">Teléfono (Opcional)</Label>
-                <Input id="phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="bg-input border-border text-foreground placeholder:text-muted-foreground" placeholder="Ej: 987 654 321" />
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                  placeholder="Ej: 987 654 321"
+                />
               </div>
-              
-              {/* --- CAMPO DE ROL Y DEPARTAMENTO ELIMINADOS DEL FORMULARIO --- */}
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-foreground">Contraseña *</Label>
                 <div className="relative">
-                  <Input id="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="bg-input border-border text-foreground placeholder:text-muted-foreground pr-10" placeholder="Mínimo 6 caracteres" required />
-                  <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)}>
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="bg-input border-border text-foreground placeholder:text-muted-foreground pr-10"
+                    placeholder="Mínimo 6 caracteres"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-primary"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </Button>
                 </div>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-foreground">Confirmar Contraseña *</Label>
-                <Input id="confirmPassword" type="password" value={formData.confirmPassword} onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} className="bg-input border-border text-foreground placeholder:text-muted-foreground" placeholder="Repite tu contraseña" required />
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                  placeholder="Repite tu contraseña"
+                  required
+                />
               </div>
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={loading}>
+
+              <Button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                disabled={loading}
+              >
                 {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
               </Button>
             </form>
+
             <div className="text-center text-muted-foreground">
               ¿Ya tienes cuenta?{' '}
               <Link to="/login" className="text-accent hover:text-accent/80 underline">Inicia sesión aquí</Link>
